@@ -5,6 +5,10 @@ import com.alisa.lswitch.server.exceptions.SwitchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Switch that controls RaspberryPi GIPO.
+ * http://pi4j.com/example/control.html
+ */
 public class RaspberrySwitch implements SwitchController {
 
   private static final Logger log = LoggerFactory.getLogger(RaspberrySwitch.class);

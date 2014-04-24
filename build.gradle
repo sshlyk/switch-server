@@ -17,7 +17,6 @@ dependencies {
   compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
   compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.7'
   compile group: 'com.pi4j', name: 'pi4j-core', version: '0.0.5'
-  compile group: 'org.codehaus.jackson', name: 'jackson-core-asl', version: '1.9.13'
   compile group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.9.13'
 
   testCompile "junit:junit:4.11"
