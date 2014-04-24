@@ -2,14 +2,24 @@ package com.alisa.lswitch.server.io;
 
 import com.alisa.lswitch.server.exceptions.SwitchException;
 
-public class RaspberrySwitch implements Switch {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class RaspberrySwitch implements SwitchController {
+
+  private static final Logger log = LoggerFactory.getLogger(RaspberrySwitch.class);
+
+  public RaspberrySwitch(int switchGPIOPinNumber) {
+    log.debug("Raspberry switch. PinNumber: {}", switchGPIOPinNumber);
+  }
+
   @Override
   public void turnOn() throws SwitchException {
-    //To change body of implemented methods use File | Settings | File Templates.
+    //TODO
   }
 
   @Override
   public void turnOff() throws SwitchException {
-    //To change body of implemented methods use File | Settings | File Templates.
+    //TODO
   }
 }
