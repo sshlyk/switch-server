@@ -3,7 +3,7 @@ project.ext {
   mainClassName = 'com.alisa.lswitch.server.Main'
 }
 
-defaultTasks = ['clean', 'jar']
+defaultTasks = ['clean', 'jar', 'test']
 
 apply plugin: 'java'
 apply plugin: 'idea'
@@ -21,7 +21,7 @@ dependencies {
 
   testCompile "junit:junit:4.11"
 }
-
+    
 jar {
   from {
     configurations.compile.collect {
