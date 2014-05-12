@@ -1,22 +1,13 @@
 package com.alisa.lswitch.client;
 
+import java.nio.ByteBuffer;
 import java.util.UUID;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static org.junit.Assert.*;
 
 public class SerializerTest {
-
-  private Serializer serializer;
-
-  @Before
-  public void setup() {
-    serializer = new Serializer(new Auth("secret".getBytes()));
-  }
 
   @Test
   public void serializeDeserializeSwitchRequestSimpleTest() {
@@ -24,7 +15,8 @@ public class SerializerTest {
     request.setRequestId(UUID.randomUUID());
     request.setTimestampMsec(System.currentTimeMillis());
     request.setOperation(SwitchRequest.Operation.SET_ON);
-    verify(request, SwitchRequest.class);
+    SwitchRequest deserializedRequest = new SwitchRequest(ByteBuffer.wrap(request.serialize()));
+    assertEquals(request, deserializedRequest);
   }
 
   @Test
@@ -32,14 +24,7 @@ public class SerializerTest {
     StatusRequest request = new StatusRequest();
     request.setRequestId(UUID.randomUUID());
     request.setTimestampMsec(System.currentTimeMillis());
-    verify(request, StatusRequest.class);
-  }
-
-  private<T extends Request> void verify(final Request expectedRequest, final Class<T> requestType) {
-    byte[] requestBytes = serializer.serialize(expectedRequest);
-    assertNotNull(requestBytes);
-    assertTrue(requestBytes.length != 0);
-    Request deserializedRequest = serializer.deserialize(requestBytes, requestType);
-    assertEquals(expectedRequest, deserializedRequest);
+    StatusRequest deserializedRequest = new StatusRequest(ByteBuffer.wrap(request.serialize()));
+    assertEquals(request, deserializedRequest);
   }
 }

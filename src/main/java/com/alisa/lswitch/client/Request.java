@@ -1,5 +1,7 @@
 package com.alisa.lswitch.client;
 
+import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
 import java.util.UUID;
 
 /**
@@ -7,8 +9,26 @@ import java.util.UUID;
  */
 public abstract class Request {
 
-  private UUID requestId;
-  private long timestampMsec;
+  private UUID requestId = UUID.randomUUID();
+  private long timestampMsec = System.currentTimeMillis();
+
+  public static final int SERIALIZER_VERSION = 1;
+  public static final int MAX_PACKET_LENGTH = 1024;
+
+  public Request() { }
+
+  public Request(ByteBuffer serializedRequest) {
+    try {
+      final int requestSerializerVersion = serializedRequest.getInt();
+      if (SERIALIZER_VERSION != requestSerializerVersion) {
+        throw new RuntimeException("Unknown request version: " + requestSerializerVersion);
+      }
+      requestId = new UUID(serializedRequest.getLong(), serializedRequest.getLong());
+      timestampMsec = serializedRequest.getLong();
+    } catch (BufferUnderflowException e) {
+      throw new RuntimeException("Invalid request. Not all the fields are passed");
+    }
+  }
 
   public UUID getRequestId() {
     return requestId;
@@ -32,6 +52,15 @@ public abstract class Request {
         "requestId=" + requestId +
         ", timestampMsec=" + timestampMsec +
         '}';
+  }
+
+  protected byte[] serialize() {
+    ByteBuffer out = ByteBuffer.wrap(new byte[4 + 3 * 8]);
+    out.putInt(SERIALIZER_VERSION);
+    out.putLong(requestId.getMostSignificantBits());
+    out.putLong(requestId.getLeastSignificantBits());
+    out.putLong(timestampMsec);
+    return out.array();
   }
 
   /* Auto-generated */

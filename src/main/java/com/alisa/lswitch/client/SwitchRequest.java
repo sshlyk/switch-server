@@ -1,5 +1,8 @@
 package com.alisa.lswitch.client;
 
+import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
+
 /**
  * Request to operate switch.
  */
@@ -7,7 +10,27 @@ public class SwitchRequest extends Request {
 
   public enum Operation { SET_ON, SET_OFF }
 
-  private Operation operation;
+  private Operation operation = Operation.SET_OFF;
+
+  public SwitchRequest() {
+    super();
+  }
+
+  public SwitchRequest(ByteBuffer serializedRequest) {
+    super(serializedRequest);
+    try {
+      // extract operation
+      final int operationOrdinal = serializedRequest.getInt();
+      final SwitchRequest.Operation[] availableOperations = SwitchRequest.Operation.values();
+      if (operationOrdinal < 0 || operationOrdinal >= availableOperations.length) {
+        throw new RuntimeException("Invalid switch request operation: " + operationOrdinal);
+      }
+      operation = availableOperations[operationOrdinal];
+    } catch (BufferUnderflowException e) {
+      throw new RuntimeException("Invalid request. Not all the fields are passed");
+    }
+  }
+
 
   public Operation getOperation() {
     return operation;
@@ -15,6 +38,15 @@ public class SwitchRequest extends Request {
 
   public void setOperation(Operation operation) {
     this.operation = operation;
+  }
+
+  @Override
+  public byte[] serialize() {
+    final byte[] base = super.serialize();
+    final ByteBuffer bb = ByteBuffer.wrap(new byte[base.length + 4]);
+    bb.put(base);
+    bb.putInt(operation.ordinal());
+    return bb.array();
   }
 
   @Override
