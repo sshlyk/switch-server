@@ -1,5 +1,8 @@
 package com.alisa.lswitch.server;
 
+import java.net.DatagramSocket;
+import java.net.SocketException;
+
 import com.alisa.lswitch.client.Auth;
 import com.alisa.lswitch.server.io.SwitchController;
 
@@ -14,12 +17,18 @@ public class SwitchRequestListener implements Runnable {
   private static final Logger log = LoggerFactory.getLogger(SwitchRequestListener.class);
   private final SwitchController switchController;
   private final Auth auth;
+  private final DatagramSocket socket;
 
   public SwitchRequestListener(final SwitchController switchController,
                                final int port, final Auth auth) {
     log.debug("Starting switch request listener. Port: {}", port);
     this.switchController = switchController;
     this.auth = auth;
+    try {
+      this.socket = new DatagramSocket(port);
+    } catch (SocketException e) {
+      throw new RuntimeException("Failed to create socket", e);
+    }
   }
 
   @Override

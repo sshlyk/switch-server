@@ -1,7 +1,5 @@
 package com.alisa.lswitch.server.io;
 
-import java.util.UUID;
-
 import com.alisa.lswitch.server.exceptions.SwitchException;
 
 /**

@@ -29,15 +29,15 @@ public class  Main {
   public static void main(String[] args) {
     log.info("Starting switch server...");
     final AppConfig config = getAppConfig(args);
-    final SwitchManager switchManager = initSwitchManager(config);
+    final DeviceManager deviceManager = initSwitchManager(config);
     final Auth auth = new Auth(
         config.getString("defaultPassword").getBytes(StandardCharsets.UTF_8)
     );
 
     final StatusRequestListener statusRequestListener =
-        initStatusRequestListener(config, switchManager, auth);
+        initStatusRequestListener(config, deviceManager, auth);
     final SwitchRequestListener switchRequestListener =
-        initSwitchRequestListener(config, switchManager, auth);
+        initSwitchRequestListener(config, deviceManager, auth);
 
     new Thread(statusRequestListener) {{
       setDaemon(true);
@@ -48,21 +48,21 @@ public class  Main {
 
   /* Initialize status request listener that broadcast switch status */
   private static StatusRequestListener initStatusRequestListener(
-      final AppConfig appConfig, final SwitchManager switchManager, final Auth auth) {
+      final AppConfig appConfig, final DeviceManager deviceManager, final Auth auth) {
     final int port = appConfig.getInt("statusListenerPort");
-    return new StatusRequestListener(port, switchManager, auth);
+    return new StatusRequestListener(port, deviceManager, auth);
   }
 
   /* Initialize switch request listener that operates GPIO pins */
   private static SwitchRequestListener initSwitchRequestListener(
-      final AppConfig appConfig, final SwitchManager switchManagers, final Auth auth) {
+      final AppConfig appConfig, final DeviceManager deviceManagers, final Auth auth) {
     final int port = appConfig.getInt("switchListenerPort");
-    final SwitchController controller = switchManagers.getController();
+    final SwitchController controller = deviceManagers.getController();
     return new SwitchRequestListener(controller, port, auth);
   }
 
   /* Initialize switch manager that keeps track of switch status and has instance of controller */
-  private static SwitchManager initSwitchManager(AppConfig appConfig) {
+  private static DeviceManager initSwitchManager(AppConfig appConfig) {
     final SwitchController switchController;
     final UUID switchId;
     if (Boolean.TRUE.equals(appConfig.getBoolean("mockSwitch"))) {
@@ -74,7 +74,7 @@ public class  Main {
       switchController = new RaspberrySwitch(pinNumber);
       switchId = SwitchUtils.getSerialNumber();
     }
-    return new SwitchManager(switchController, switchId);
+    return new DeviceManager(switchController, switchId);
   }
 
   /* Read application configuration from resources */

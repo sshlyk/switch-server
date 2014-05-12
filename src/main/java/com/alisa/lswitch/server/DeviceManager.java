@@ -11,13 +11,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Manages switch info and status. Thread safe.
  */
-public class SwitchManager {
+public class DeviceManager {
 
   private final Status status;
   private final SwitchController controller;
-  private static Logger log = LoggerFactory.getLogger(SwitchManager.class);
+  private static Logger log = LoggerFactory.getLogger(DeviceManager.class);
 
-  public SwitchManager(SwitchController switchController, UUID switchId) {
+  public DeviceManager(SwitchController switchController, UUID switchId) {
     log.debug("Device ID: " + switchId);
 
     this.status = new Status();
@@ -41,12 +41,12 @@ public class SwitchManager {
   public class Status {
 
     private UUID switchId;
-    private boolean state;
+    private int state;
 
     private Status() { }
     public UUID getSwitchId() { return switchId; }
 
-    public boolean isOn() {
+    public int getState() {
       synchronized (controller) {
         return state;
       }
@@ -70,7 +70,7 @@ public class SwitchManager {
     public void turnOn() throws SwitchException {
       synchronized (controller) {
         controller.turnOn();
-        status.state = true;
+        status.state = 1;
       }
     }
 
@@ -78,7 +78,7 @@ public class SwitchManager {
     public void turnOff() throws SwitchException {
       synchronized (controller) {
         controller.turnOff();
-        status.state = false;
+        status.state = 0;
       }
     }
   }

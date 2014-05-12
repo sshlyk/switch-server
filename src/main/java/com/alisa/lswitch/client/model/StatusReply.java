@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public class StatusReply extends BaseModel {
   private UUID deviceId;
-  private boolean status;
+  private int state;
 
   public StatusReply() { }
 
@@ -14,7 +14,7 @@ public class StatusReply extends BaseModel {
     super(serializedRequest);
     try {
       deviceId = new UUID(serializedRequest.getLong(), serializedRequest.getLong());
-      status = serializedRequest.get() != 0;
+      state = serializedRequest.getInt();
     } catch (BufferUnderflowException e) {
       throw new RuntimeException("Invalid request. Not all the fields are passed");
     }
@@ -23,14 +23,54 @@ public class StatusReply extends BaseModel {
   @Override
   public byte[] serialize() {
     final byte[] base = super.serialize();
-    ByteBuffer bb = ByteBuffer.wrap(new byte[base.length + 16 + 1]);
+    ByteBuffer bb = ByteBuffer.wrap(new byte[base.length + 16 + 4]);
     bb.put(base);
     if (deviceId == null) {
       throw new RuntimeException("Device id is missing");
     }
     bb.putLong(deviceId.getMostSignificantBits());
     bb.putLong(deviceId.getLeastSignificantBits());
-    bb.put((byte) (status ? 1 : 0));
+    bb.putInt(state);
     return bb.array();
+  }
+
+  public UUID getDeviceId() {
+    return deviceId;
+  }
+
+  public void setDeviceId(UUID deviceId) {
+    this.deviceId = deviceId;
+  }
+
+  public int getState() {
+    return state;
+  }
+
+  public void setState(int state) {
+    this.state = state;
+  }
+
+  /* Auto-generated */
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    if (!super.equals(o)) return false;
+
+    StatusReply that = (StatusReply) o;
+
+    if (state != that.state) return false;
+    if (deviceId != null ? !deviceId.equals(that.deviceId) : that.deviceId != null) return false;
+
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (deviceId != null ? deviceId.hashCode() : 0);
+    result = 31 * result + state;
+    return result;
   }
 }
