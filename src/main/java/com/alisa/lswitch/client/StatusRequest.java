@@ -1,4 +1,4 @@
-package com.alisa.lswitch.server.lib.requests;
+package com.alisa.lswitch.client;
 
 /**
  * Request to broadcast status.

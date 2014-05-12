@@ -13,6 +13,16 @@ repositories {
   mavenCentral()
 }
 
+/* Create jar to run server. Pack all dependencies. */
+jar {
+  from {
+    configurations.compile.collect {
+      it.isDirectory() || it.name.endsWith(".so") ? it : zipTree(it)
+    }
+  }
+  manifest { attributes 'Main-Class': project.mainClassName }
+}
+
 dependencies {
   compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
   compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.7'
@@ -22,11 +32,34 @@ dependencies {
   testCompile "junit:junit:4.11"
 }
 
-jar {
-  from {
-    configurations.compile.collect {
-      it.isDirectory() || it.name.endsWith(".so") ? it : zipTree(it)
+/* Generate client jar (serialisation/de-serialisation) */
+sourceSets {
+  client {
+    java {
+      srcDir 'src/main/java/com/alisa/lswitch/client'
     }
   }
-  manifest { attributes 'Main-Class': project.mainClassName }
+  clientTest {
+    java {
+      srcDir 'src/test/java/com/alisa/lswitch/client'
+    }
+  }
+}
+
+task clientTest(type: Test) {
+  testClassesDir = sourceSets.clientTest.output.classesDir
+  classpath = sourceSets.clientTest.runtimeClasspath
+}
+
+task clientJar(type: Jar) {
+  dependsOn clientTest
+  classifier = 'client'
+  from sourceSets.client.output
+}
+
+dependencies {
+  clientCompile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
+  clientCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.7'
+
+  clientTestCompile "junit:junit:4.11"
 }

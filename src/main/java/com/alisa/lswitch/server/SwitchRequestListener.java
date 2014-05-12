@@ -1,5 +1,6 @@
 package com.alisa.lswitch.server;
 
+import com.alisa.lswitch.client.Serializer;
 import com.alisa.lswitch.server.io.SwitchController;
 
 import org.slf4j.Logger;
@@ -12,11 +13,14 @@ public class SwitchRequestListener implements Runnable {
 
   private static final Logger log = LoggerFactory.getLogger(SwitchRequestListener.class);
   private final SwitchController switchController;
+  private final Serializer serializer;
 
-  public SwitchRequestListener(final SwitchController switchController,  final int port) {
+  public SwitchRequestListener(final SwitchController switchController,  final int port,
+                               final Serializer serializer) {
     log.debug("Starting switch request listener. Port: {}", port);
 
     this.switchController = switchController;
+    this.serializer = serializer;
   }
 
   @Override

@@ -2,9 +2,12 @@ package com.alisa.lswitch.server;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
 
+import com.alisa.lswitch.client.Auth;
+import com.alisa.lswitch.client.Serializer;
 import com.alisa.lswitch.server.io.MockSwitch;
 import com.alisa.lswitch.server.io.RaspberrySwitch;
 import com.alisa.lswitch.server.io.SwitchController;
@@ -29,11 +32,14 @@ public class  Main {
     log.info("Starting switch server...");
     final AppConfig config = getAppConfig(args);
     final SwitchManager switchManager = initSwitchManager(config);
+    final Serializer serializer = new Serializer(new Auth(
+      config.getString("defaultPassword").getBytes(StandardCharsets.UTF_8)
+    ));
 
     final StatusRequestListener statusRequestListener =
-        initStatusRequestListener(config, switchManager);
+        initStatusRequestListener(config, switchManager, serializer);
     final SwitchRequestListener switchRequestListener =
-        initSwitchRequestListener(config, switchManager);
+        initSwitchRequestListener(config, switchManager, serializer);
 
     new Thread(statusRequestListener) {{
       setDaemon(true);
@@ -44,17 +50,17 @@ public class  Main {
 
   /* Initialize status request listener that broadcast switch status */
   private static StatusRequestListener initStatusRequestListener(
-      final AppConfig appConfig, final SwitchManager switchManager) {
+      final AppConfig appConfig, final SwitchManager switchManager, final Serializer serializer) {
     final int port = appConfig.getInt("statusListenerPort");
-    return new StatusRequestListener(port, switchManager);
+    return new StatusRequestListener(port, switchManager, serializer);
   }
 
   /* Initialize switch request listener that operates GPIO pins */
   private static SwitchRequestListener initSwitchRequestListener(
-      AppConfig appConfig, SwitchManager switchManagers) {
+      AppConfig appConfig, SwitchManager switchManagers, final Serializer serializer) {
     final int port = appConfig.getInt("switchListenerPort");
     final SwitchController controller = switchManagers.getController();
-    return new SwitchRequestListener(controller, port);
+    return new SwitchRequestListener(controller, port, serializer);
   }
 
   /* Initialize switch manager that keeps track of switch status and has instance of controller */

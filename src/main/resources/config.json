@@ -2,7 +2,8 @@
   "common": {
     "statusListenerPort": 51234,
     "switchListenerPort": 61234,
-    "switchPinNumber": 7
+    "switchPinNumber": 7,
+    "defaultPassword": "helloSwitch"
   },
   "development": {
     "mockSwitch": true
