@@ -26,7 +26,7 @@ public abstract class BaseModel {
       requestId = new UUID(serializedRequest.getLong(), serializedRequest.getLong());
       timestampMsec = serializedRequest.getLong();
     } catch (BufferUnderflowException e) {
-      throw new RuntimeException("Invalid request. Not all the fields are passed");
+      throw new SerializationException("Invalid request. Not all the fields are passed");
     }
   }
 
@@ -83,5 +83,11 @@ public abstract class BaseModel {
     int result = requestId != null ? requestId.hashCode() : 0;
     result = 31 * result + (int) (timestampMsec ^ (timestampMsec >>> 32));
     return result;
+  }
+
+  public static class SerializationException extends RuntimeException {
+    public SerializationException(String message) {
+      super(message);
+    }
   }
 }

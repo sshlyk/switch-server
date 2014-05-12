@@ -55,10 +55,9 @@ public class  Main {
 
   /* Initialize switch request listener that operates GPIO pins */
   private static SwitchRequestListener initSwitchRequestListener(
-      final AppConfig appConfig, final DeviceManager deviceManagers, final Auth auth) {
+      final AppConfig appConfig, final DeviceManager deviceManager, final Auth auth) {
     final int port = appConfig.getInt("switchListenerPort");
-    final SwitchController controller = deviceManagers.getController();
-    return new SwitchRequestListener(controller, port, auth);
+    return new SwitchRequestListener(deviceManager, port, auth);
   }
 
   /* Initialize switch manager that keeps track of switch status and has instance of controller */

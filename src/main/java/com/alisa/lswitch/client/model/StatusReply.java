@@ -16,7 +16,7 @@ public class StatusReply extends BaseModel {
       deviceId = new UUID(serializedRequest.getLong(), serializedRequest.getLong());
       state = serializedRequest.getInt();
     } catch (BufferUnderflowException e) {
-      throw new RuntimeException("Invalid request. Not all the fields are passed");
+      throw new SerializationException("Invalid request. Not all the fields are passed");
     }
   }
 
@@ -26,7 +26,7 @@ public class StatusReply extends BaseModel {
     ByteBuffer bb = ByteBuffer.wrap(new byte[base.length + 16 + 4]);
     bb.put(base);
     if (deviceId == null) {
-      throw new RuntimeException("Device id is missing");
+      throw new SerializationException("Device id is missing");
     }
     bb.putLong(deviceId.getMostSignificantBits());
     bb.putLong(deviceId.getLeastSignificantBits());

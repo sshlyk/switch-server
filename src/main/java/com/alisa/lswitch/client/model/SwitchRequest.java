@@ -23,11 +23,11 @@ public class SwitchRequest extends BaseModel {
       final int operationOrdinal = serializedRequest.getInt();
       final SwitchRequest.Operation[] availableOperations = SwitchRequest.Operation.values();
       if (operationOrdinal < 0 || operationOrdinal >= availableOperations.length) {
-        throw new RuntimeException("Invalid switch request operation: " + operationOrdinal);
+        throw new SerializationException("Invalid switch request operation: " + operationOrdinal);
       }
       operation = availableOperations[operationOrdinal];
     } catch (BufferUnderflowException e) {
-      throw new RuntimeException("Invalid request. Not all the fields are passed");
+      throw new SerializationException("Invalid request. Not all the fields are passed");
     }
   }
 

@@ -8,6 +8,7 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 
 import com.alisa.lswitch.client.Auth;
+import com.alisa.lswitch.client.model.BaseModel;
 import com.alisa.lswitch.client.model.StatusReply;
 import com.alisa.lswitch.client.model.StatusRequest;
 
@@ -51,20 +52,18 @@ public class StatusRequestListener implements Runnable {
           log.debug("Received unauthorized request. Dropping: {}", request);
         }
       } catch (IOException e) {
-        log.info("Failed to process request", e);
-        //TODO
+        log.warn("Failed to process request due to IO exception", e);
+      } catch (BaseModel.SerializationException e) {
+        log.debug("Failed to deserialize request", e);
       }
     }
   }
 
-  public void processRequest(StatusRequest request, InetAddress ip, int port)
+  private void processRequest(StatusRequest request, InetAddress ip, int port)
   throws IOException {
     log.info("Replying with the status to {}:{} Status: {}",
         ip, port, deviceManager.getStatus().toString());
-    DeviceManager.Status status = deviceManager.getStatus();
-    final StatusReply statusReply = new StatusReply();
-    statusReply.setDeviceId(status.getSwitchId());
-    statusReply.setState(status.getState());
+    final StatusReply statusReply = toStatusReply(deviceManager.getStatus());
     final byte[] statusReplyBytes = statusReply.serialize();
     DatagramPacket packet = new DatagramPacket(
         statusReplyBytes,
@@ -73,5 +72,12 @@ public class StatusRequestListener implements Runnable {
         port
     );
     socket.send(packet);
+  }
+
+  public static StatusReply toStatusReply(DeviceManager.Status status) {
+    final StatusReply statusReply = new StatusReply();
+    statusReply.setDeviceId(status.getSwitchId());
+    statusReply.setState(status.getState());
+    return statusReply;
   }
 }
