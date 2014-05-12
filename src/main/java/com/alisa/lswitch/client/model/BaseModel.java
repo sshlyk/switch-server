@@ -1,4 +1,4 @@
-package com.alisa.lswitch.client;
+package com.alisa.lswitch.client.model;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
@@ -7,7 +7,7 @@ import java.util.UUID;
 /**
  * Base class for all com.alisa.lswitch.client.
  */
-public abstract class Request {
+public abstract class BaseModel {
 
   private UUID requestId = UUID.randomUUID();
   private long timestampMsec = System.currentTimeMillis();
@@ -15,9 +15,9 @@ public abstract class Request {
   public static final int SERIALIZER_VERSION = 1;
   public static final int MAX_PACKET_LENGTH = 1024;
 
-  public Request() { }
+  public BaseModel() { }
 
-  public Request(ByteBuffer serializedRequest) {
+  public BaseModel(ByteBuffer serializedRequest) {
     try {
       final int requestSerializerVersion = serializedRequest.getInt();
       if (SERIALIZER_VERSION != requestSerializerVersion) {
@@ -48,13 +48,13 @@ public abstract class Request {
 
   @Override
   public String toString() {
-    return "Request{" +
+    return "BaseModel{" +
         "requestId=" + requestId +
         ", timestampMsec=" + timestampMsec +
         '}';
   }
 
-  protected byte[] serialize() {
+  public byte[] serialize() {
     ByteBuffer out = ByteBuffer.wrap(new byte[4 + 3 * 8]);
     out.putInt(SERIALIZER_VERSION);
     out.putLong(requestId.getMostSignificantBits());
@@ -69,7 +69,7 @@ public abstract class Request {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    Request request = (Request) o;
+    BaseModel request = (BaseModel) o;
 
     if (timestampMsec != request.timestampMsec) return false;
     if (requestId != null ? !requestId.equals(request.requestId) : request.requestId != null)

@@ -1,22 +1,32 @@
 package com.alisa.lswitch.client;
 
+import java.nio.ByteBuffer;
 import java.util.UUID;
+
+import com.alisa.lswitch.client.model.StatusRequest;
+import com.alisa.lswitch.client.model.BaseModel;
+import com.alisa.lswitch.client.model.SwitchRequest;
 
 /**
  * Proxy that abstracts client-server communications.
  */
 public class SwitchProxy {
 
-  private Serializer serializer;
+  private final Auth auth;
 
-  public SwitchProxy(Serializer serializer) {
-    this.serializer = serializer;
+  public SwitchProxy(Auth auth) {
+    this.auth = auth;
   }
 
   public void requestStatusBroadcast(final Wire wire) {
     final StatusRequest request = new StatusRequest();
     setBaseRequest(request);
-    wire.send(serializer.serialize(request));
+    final byte[] signature = auth.sign(request);
+    final byte[] serializedRequest = request.serialize();
+    ByteBuffer packet = ByteBuffer.wrap(new byte[signature.length + serializedRequest.length]);
+    packet.put(serializedRequest);
+    packet.put(signature);
+    wire.send(packet.array());
   }
 
   public void changeSwitchStatus(SwitchRequest.Operation op) {
@@ -25,7 +35,7 @@ public class SwitchProxy {
     request.setOperation(op);
   }
 
-  private void setBaseRequest(final Request request) {
+  private void setBaseRequest(final BaseModel request) {
     request.setRequestId(UUID.randomUUID());
     request.setTimestampMsec(System.currentTimeMillis());
   }

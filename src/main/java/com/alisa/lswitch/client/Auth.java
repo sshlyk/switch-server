@@ -3,6 +3,8 @@ package com.alisa.lswitch.client;
 import java.io.ByteArrayInputStream;
 import java.nio.ByteBuffer;
 
+import com.alisa.lswitch.client.model.BaseModel;
+
 //TODO implement signature
 public class Auth {
 
@@ -12,13 +14,13 @@ public class Auth {
     this.secret = secret;
   }
 
-  public byte[] sign(byte[] bytesToSign) {
+  public byte[] sign(final BaseModel request) {
     //TODO
-    return bytesToSign;
+    return new byte[1];
   }
 
-  public byte[] verify(byte[] bytesToVerify) {
+  public boolean isValid(final BaseModel request, ByteBuffer signature) {
     //TODO
-    return bytesToVerify;
+    return true;
   }
 }

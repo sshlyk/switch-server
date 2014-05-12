@@ -3,6 +3,9 @@ package com.alisa.lswitch.client;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
+import com.alisa.lswitch.client.model.StatusRequest;
+import com.alisa.lswitch.client.model.SwitchRequest;
+
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;

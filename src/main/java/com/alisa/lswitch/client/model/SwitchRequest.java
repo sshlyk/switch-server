@@ -1,12 +1,12 @@
-package com.alisa.lswitch.client;
+package com.alisa.lswitch.client.model;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
 /**
- * Request to operate switch.
+ * BaseModel to operate switch.
  */
-public class SwitchRequest extends Request {
+public class SwitchRequest extends BaseModel {
 
   public enum Operation { SET_ON, SET_OFF }
 
