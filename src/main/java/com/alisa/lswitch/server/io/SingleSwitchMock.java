@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Switch controller that can be used for development purposes and does not interact with GPIO.
  */
-public class MockSwitch implements SwitchController {
+public class SingleSwitchMock implements SwitchController {
 
-  private static final Logger log = LoggerFactory.getLogger(MockSwitch.class);
+  private static final Logger log = LoggerFactory.getLogger(SingleSwitchMock.class);
 
   @Override
   public void turnOn() throws SwitchException {

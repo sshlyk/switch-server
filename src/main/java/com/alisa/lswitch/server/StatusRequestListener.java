@@ -30,7 +30,7 @@ public class StatusRequestListener implements Runnable {
     try {
       this.socket = new DatagramSocket(port);
     } catch (SocketException e) {
-      throw new RuntimeException("Failed to create datagram socket on port " + port);
+      throw new RuntimeException("Failed to create socket. Port " + port, e);
     }
     this.deviceManager = deviceManager;
     this.auth = auth;

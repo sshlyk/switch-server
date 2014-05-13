@@ -2,12 +2,14 @@ package com.alisa.lswitch.client.model;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.util.UUID;
 
 /**
  * BaseModel to operate switch.
  */
 public class SwitchRequest extends BaseModel {
 
+  public UUID deviceId;
   public enum Operation { SET_ON, SET_OFF }
 
   private Operation operation = Operation.SET_OFF;
@@ -19,6 +21,7 @@ public class SwitchRequest extends BaseModel {
   public SwitchRequest(ByteBuffer serializedRequest) {
     super(serializedRequest);
     try {
+      deviceId = new UUID(serializedRequest.getLong(), serializedRequest.getLong());
       // extract operation
       final int operationOrdinal = serializedRequest.getInt();
       final SwitchRequest.Operation[] availableOperations = SwitchRequest.Operation.values();
@@ -40,11 +43,24 @@ public class SwitchRequest extends BaseModel {
     this.operation = operation;
   }
 
+  public UUID getDeviceId() {
+    return deviceId;
+  }
+
+  public void setDeviceId(UUID deviceId) {
+    this.deviceId = deviceId;
+  }
+
   @Override
   public byte[] serialize() {
     final byte[] base = super.serialize();
-    final ByteBuffer bb = ByteBuffer.wrap(new byte[base.length + 4]);
+    final ByteBuffer bb = ByteBuffer.wrap(new byte[base.length + 16 + 4]);
     bb.put(base);
+    if (deviceId == null) {
+      throw new SerializationException("Device id is missing");
+    }
+    bb.putLong(deviceId.getMostSignificantBits());
+    bb.putLong(deviceId.getLeastSignificantBits());
     bb.putInt(operation.ordinal());
     return bb.array();
   }

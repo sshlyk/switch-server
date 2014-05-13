@@ -40,7 +40,8 @@ public class AppConfig {
 
   private <T> T getVal(String key, Class<T> klass) {
     Object val = config.get(key);
-    if (val != null && klass.isInstance(val)) {
+    if (val == null) { return null; }
+    if (klass.isInstance(val)) {
       try {
         return (T) val;
       } catch (ClassCastException e) {

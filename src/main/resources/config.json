@@ -1,7 +1,7 @@
 {
   "common": {
-    "statusListenerPort": 51234,
-    "switchListenerPort": 61234,
+    "statusListenerPort": 51235,
+    "switchListenerPort": 61235,
     "switchPinNumber": 7,
     "defaultPassword": "helloSwitch"
   },

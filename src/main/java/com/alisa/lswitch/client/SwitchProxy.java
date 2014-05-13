@@ -21,18 +21,24 @@ public class SwitchProxy {
   public void requestStatusBroadcast(final Wire wire) {
     final StatusRequest request = new StatusRequest();
     setBaseRequest(request);
+    wire.send(serializeAndSign(request));
+  }
+
+  public void changeSwitchStatus(UUID deviceId, SwitchRequest.Operation op, final Wire wire) {
+    final SwitchRequest request = new SwitchRequest();
+    setBaseRequest(request);
+    request.setDeviceId(deviceId);
+    request.setOperation(op);
+    wire.send(serializeAndSign(request));
+  }
+
+  private byte[] serializeAndSign(BaseModel request) {
     final byte[] signature = auth.sign(request);
     final byte[] serializedRequest = request.serialize();
     ByteBuffer packet = ByteBuffer.wrap(new byte[signature.length + serializedRequest.length]);
     packet.put(serializedRequest);
     packet.put(signature);
-    wire.send(packet.array());
-  }
-
-  public void changeSwitchStatus(SwitchRequest.Operation op) {
-    final SwitchRequest request = new SwitchRequest();
-    setBaseRequest(request);
-    request.setOperation(op);
+    return packet.array();
   }
 
   private void setBaseRequest(final BaseModel request) {

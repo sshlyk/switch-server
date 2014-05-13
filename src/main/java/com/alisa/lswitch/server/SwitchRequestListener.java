@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
+import java.util.UUID;
 
 import com.alisa.lswitch.client.Auth;
 import com.alisa.lswitch.client.model.BaseModel;
@@ -25,6 +26,7 @@ public class SwitchRequestListener implements Runnable {
   private final DeviceManager deviceManager;
   private final Auth auth;
   private final DatagramSocket socket;
+  private final UUID deviceId;
 
   public SwitchRequestListener(final DeviceManager deviceManager,
                                final int port, final Auth auth) {
@@ -34,8 +36,9 @@ public class SwitchRequestListener implements Runnable {
     try {
       this.socket = new DatagramSocket(port);
     } catch (SocketException e) {
-      throw new RuntimeException("Failed to create socket", e);
+      throw new RuntimeException("Failed to create socket. Port: " + port, e);
     }
+    this.deviceId = deviceManager.getStatus().getSwitchId();
   }
 
   @Override
@@ -48,7 +51,7 @@ public class SwitchRequestListener implements Runnable {
         socket.receive(packet);
         ByteBuffer bb = ByteBuffer.wrap(packet.getData());
         SwitchRequest request = new SwitchRequest(bb);
-        if (auth.isValid(request, bb)) {
+        if (deviceId.equals(request.getDeviceId()) && auth.isValid(request, bb)) {
           process(request, packet.getAddress(), packet.getPort());
         } else {
           log.info("Unauthorized switch request {}", request);

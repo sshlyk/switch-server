@@ -18,6 +18,7 @@ public class SerializerTest {
     SwitchRequest request = new SwitchRequest();
     request.setRequestId(UUID.randomUUID());
     request.setTimestampMsec(System.currentTimeMillis());
+    request.setDeviceId(UUID.randomUUID());
     request.setOperation(SwitchRequest.Operation.SET_ON);
     SwitchRequest deserializedRequest = new SwitchRequest(ByteBuffer.wrap(request.serialize()));
     assertEquals(request, deserializedRequest);

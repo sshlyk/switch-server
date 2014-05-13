@@ -13,7 +13,6 @@ public abstract class BaseModel {
   private long timestampMsec = System.currentTimeMillis();
 
   public static final int SERIALIZER_VERSION = 1;
-  public static final int MAX_PACKET_LENGTH = 1024;
 
   public BaseModel() { }
 
@@ -21,7 +20,8 @@ public abstract class BaseModel {
     try {
       final int requestSerializerVersion = serializedRequest.getInt();
       if (SERIALIZER_VERSION != requestSerializerVersion) {
-        throw new RuntimeException("Unknown request version: " + requestSerializerVersion);
+        throw new SerializationException(
+            "Unknown serialization version: " + requestSerializerVersion);
       }
       requestId = new UUID(serializedRequest.getLong(), serializedRequest.getLong());
       timestampMsec = serializedRequest.getLong();

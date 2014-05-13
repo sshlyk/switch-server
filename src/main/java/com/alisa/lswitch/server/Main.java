@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.alisa.lswitch.client.Auth;
-import com.alisa.lswitch.server.io.MockSwitch;
-import com.alisa.lswitch.server.io.RaspberrySwitch;
+import com.alisa.lswitch.server.io.SingleSwitchMock;
+import com.alisa.lswitch.server.io.SingleSwitch;
 import com.alisa.lswitch.server.io.SwitchController;
 import com.alisa.lswitch.server.lib.AppConfig;
 import com.alisa.lswitch.server.lib.SwitchUtils;
@@ -66,11 +66,11 @@ public class  Main {
     final UUID switchId;
     if (Boolean.TRUE.equals(appConfig.getBoolean("mockSwitch"))) {
       log.debug("Using mocked switch");
-      switchController = new MockSwitch();
+      switchController = new SingleSwitchMock();
       switchId = UUID.randomUUID();
     } else {
       final int pinNumber = appConfig.getInt("switchPinNumber");
-      switchController = new RaspberrySwitch(pinNumber);
+      switchController = new SingleSwitch(pinNumber);
       switchId = SwitchUtils.getSerialNumber();
     }
     return new DeviceManager(switchController, switchId);

@@ -11,11 +11,10 @@ import org.slf4j.LoggerFactory;
 
 public class SwitchUtils {
 
-  private static final Logger log = LoggerFactory.getLogger(SwitchUtils.class);
-
   /* pi4j SystemInfo is not thread safe */
   private static Object systemInfoLock = new Object();
   private static int serialNumberBitLength = 128;
+  private static Logger log = LoggerFactory.getLogger(SwitchUtils.class);
 
   public static UUID getSerialNumber() {
     synchronized (systemInfoLock) {
@@ -27,9 +26,6 @@ public class SwitchUtils {
         throw new RuntimeException("Failed to retrieve raspberry serial number", e);
       }
 
-      if (bigInteger.bitLength() < 128) {
-        throw new RuntimeException("Unexpected serial number length: {}" + bigInteger.bitLength());
-      }
       long leastSignificantBits = bigInteger.longValue();
       long mostSignificantBits = bigInteger.shiftRight(serialNumberBitLength / 2).longValue();
 
