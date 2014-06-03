@@ -1,9 +1,8 @@
 package com.alisa.lswitch.client;
 
-import java.io.ByteArrayInputStream;
 import java.nio.ByteBuffer;
 
-import com.alisa.lswitch.client.model.BaseModel;
+import com.alisa.lswitch.client.model.BaseRequest;
 
 //TODO implement signature
 public class Auth {
@@ -14,12 +13,12 @@ public class Auth {
     this.secret = secret;
   }
 
-  public byte[] sign(final BaseModel request) {
+  public byte[] sign(final BaseRequest request) {
     //TODO
     return new byte[1];
   }
 
-  public boolean isValid(final BaseModel request, ByteBuffer signature) {
+  public boolean isValid(final BaseRequest request, ByteBuffer signature) {
     //TODO
     return true;
   }

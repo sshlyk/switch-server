@@ -21,4 +21,9 @@ public class SingleSwitchMock implements SwitchController {
   public void turnOff() throws SwitchException {
     log.info("Switch is OFF");
   }
+
+  @Override
+  public void blink() {
+    log.info("Blink");
+  }
 }

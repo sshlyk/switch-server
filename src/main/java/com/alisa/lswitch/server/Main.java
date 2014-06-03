@@ -50,7 +50,7 @@ public class  Main {
   private static StatusRequestListener initStatusRequestListener(
       final AppConfig appConfig, final DeviceManager deviceManager, final Auth auth) {
     final int port = appConfig.getInt("statusListenerPort");
-    return new StatusRequestListener(port, deviceManager, auth);
+    return new StatusRequestListener(deviceManager, port, auth);
   }
 
   /* Initialize switch request listener that operates GPIO pins */
@@ -73,7 +73,7 @@ public class  Main {
       switchController = new SingleSwitch(pinNumber);
       switchId = SwitchUtils.getSerialNumber();
     }
-    return new DeviceManager(switchController, switchId);
+    return new DeviceManager(switchController, switchId, appConfig.getString("deviceType"));
   }
 
   /* Read application configuration from resources */

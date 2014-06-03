@@ -1,10 +1,11 @@
 package com.alisa.lswitch.client;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
+import com.alisa.lswitch.client.model.BaseRequest;
 import com.alisa.lswitch.client.model.StatusRequest;
-import com.alisa.lswitch.client.model.BaseModel;
 import com.alisa.lswitch.client.model.SwitchRequest;
 
 /**
@@ -18,13 +19,15 @@ public class SwitchProxy {
     this.auth = auth;
   }
 
-  public void requestStatusBroadcast(final Wire wire) {
+  public void requestStatusBroadcast(final Wire wire)
+  throws IOException {
     final StatusRequest request = new StatusRequest();
     setBaseRequest(request);
     wire.send(serializeAndSign(request));
   }
 
-  public void changeSwitchStatus(UUID deviceId, SwitchRequest.Operation op, final Wire wire) {
+  public void changeSwitchStatus(UUID deviceId, SwitchRequest.Operation op, final Wire wire)
+  throws IOException {
     final SwitchRequest request = new SwitchRequest();
     setBaseRequest(request);
     request.setDeviceId(deviceId);
@@ -32,7 +35,7 @@ public class SwitchProxy {
     wire.send(serializeAndSign(request));
   }
 
-  private byte[] serializeAndSign(BaseModel request) {
+  private byte[] serializeAndSign(BaseRequest request) {
     final byte[] signature = auth.sign(request);
     final byte[] serializedRequest = request.serialize();
     ByteBuffer packet = ByteBuffer.wrap(new byte[signature.length + serializedRequest.length]);
@@ -41,18 +44,12 @@ public class SwitchProxy {
     return packet.array();
   }
 
-  private void setBaseRequest(final BaseModel request) {
+  private void setBaseRequest(final BaseRequest request) {
     request.setRequestId(UUID.randomUUID());
     request.setTimestampMsec(System.currentTimeMillis());
   }
 
   public static interface Wire {
-    void send(byte[] request) throws WireException;
-  }
-
-  public static class WireException extends RuntimeException {
-    public WireException(String message, Throwable t) {
-      super(message, t);
-    }
+    void send(byte[] request) throws IOException;
   }
 }

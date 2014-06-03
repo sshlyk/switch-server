@@ -42,6 +42,7 @@ sourceSets {
   clientTest {
     java {
       srcDir 'src/test/java/com/alisa/lswitch/client'
+      srcDir 'src/main/java/com/alisa/lswitch/client'
     }
   }
 }

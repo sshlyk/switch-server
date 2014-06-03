@@ -11,12 +11,17 @@ public interface SwitchController {
    * Turn switch ON.
    * @throws SwitchException
    */
-  public void turnOn() throws SwitchException;
+  public void turnOn();
 
   /**
    * Turn switch OFF.
    * @throws SwitchException
    */
-  public void turnOff() throws SwitchException;
+  public void turnOff();
+
+  /**
+   * Turn on and then off.
+   */
+  public void blink();
 
 }

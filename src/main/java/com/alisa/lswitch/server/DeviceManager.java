@@ -13,16 +13,18 @@ import org.slf4j.LoggerFactory;
  */
 public class DeviceManager {
 
+  private final String deviceType;
   private final Status status;
   private final SwitchController controller;
   private static Logger log = LoggerFactory.getLogger(DeviceManager.class);
 
-  public DeviceManager(SwitchController switchController, UUID switchId) {
+  public DeviceManager(SwitchController switchController, UUID switchId, String deviceType) {
     log.debug("Device ID: " + switchId);
 
     this.status = new Status();
     this.controller = switchController;
     this.status.switchId = switchId;
+    this.deviceType = deviceType;
   }
 
   /* returns snapshot of current status */
@@ -34,6 +36,10 @@ public class DeviceManager {
 
   public SwitchController getController() {
     return new SwitchControllerWrapper();
+  }
+
+  public String getDeviceType() {
+    return deviceType;
   }
 
   /** Holds current status of the switch. */
@@ -80,6 +86,11 @@ public class DeviceManager {
         controller.turnOff();
         status.state = 0;
       }
+    }
+
+    @Override
+    public void blink() {
+      controller.blink();
     }
   }
 }

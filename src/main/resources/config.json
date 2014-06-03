@@ -3,7 +3,8 @@
     "statusListenerPort": 51235,
     "switchListenerPort": 61235,
     "switchPinNumber": 7,
-    "defaultPassword": "helloSwitch"
+    "defaultPassword": "helloSwitch",
+    "deviceType": "switch"
   },
   "development": {
     "mockSwitch": true

@@ -29,6 +29,7 @@ public class SerializerTest {
     StatusRequest request = new StatusRequest();
     request.setRequestId(UUID.randomUUID());
     request.setTimestampMsec(System.currentTimeMillis());
+    request.setDeviceId(UUID.randomUUID());
     StatusRequest deserializedRequest = new StatusRequest(ByteBuffer.wrap(request.serialize()));
     assertEquals(request, deserializedRequest);
   }
@@ -37,6 +38,7 @@ public class SerializerTest {
   public void serializeDeserializeStatusReplyTest() {
     StatusReply reply = new StatusReply();
     reply.setDeviceId(UUID.randomUUID());
+    reply.setDeviceType("switch");
     StatusReply deserializedReply = new StatusReply(ByteBuffer.wrap(reply.serialize()));
     assertEquals(reply, deserializedReply);
   }

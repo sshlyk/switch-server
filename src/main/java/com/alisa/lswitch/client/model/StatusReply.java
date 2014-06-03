@@ -2,19 +2,19 @@ package com.alisa.lswitch.client.model;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-import java.util.UUID;
 
-public class StatusReply extends BaseModel {
-  private UUID deviceId;
+public class StatusReply extends BaseRequest {
+
   private int state;
+  private String deviceType;
 
   public StatusReply() { }
 
   public StatusReply(ByteBuffer serializedRequest) {
     super(serializedRequest);
     try {
-      deviceId = new UUID(serializedRequest.getLong(), serializedRequest.getLong());
       state = serializedRequest.getInt();
+      deviceType = deserializeString(serializedRequest);
     } catch (BufferUnderflowException e) {
       throw new SerializationException("Invalid request. Not all the fields are passed");
     }
@@ -22,24 +22,13 @@ public class StatusReply extends BaseModel {
 
   @Override
   public byte[] serialize() {
+    final byte[] serializedDeviceType = serializeString(deviceType);
     final byte[] base = super.serialize();
-    ByteBuffer bb = ByteBuffer.wrap(new byte[base.length + 16 + 4]);
+    ByteBuffer bb = ByteBuffer.wrap(new byte[base.length + 4 + serializedDeviceType.length]);
     bb.put(base);
-    if (deviceId == null) {
-      throw new SerializationException("Device id is missing");
-    }
-    bb.putLong(deviceId.getMostSignificantBits());
-    bb.putLong(deviceId.getLeastSignificantBits());
     bb.putInt(state);
+    bb.put(serializedDeviceType);
     return bb.array();
-  }
-
-  public UUID getDeviceId() {
-    return deviceId;
-  }
-
-  public void setDeviceId(UUID deviceId) {
-    this.deviceId = deviceId;
   }
 
   public int getState() {
@@ -50,8 +39,15 @@ public class StatusReply extends BaseModel {
     this.state = state;
   }
 
-  /* Auto-generated */
+  public String getDeviceType() {
+    return deviceType;
+  }
 
+  public void setDeviceType(String deviceType) {
+    this.deviceType = deviceType;
+  }
+
+  /* Auto-generated */
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -61,7 +57,8 @@ public class StatusReply extends BaseModel {
     StatusReply that = (StatusReply) o;
 
     if (state != that.state) return false;
-    if (deviceId != null ? !deviceId.equals(that.deviceId) : that.deviceId != null) return false;
+    if (deviceType != null ? !deviceType.equals(that.deviceType) : that.deviceType != null)
+      return false;
 
     return true;
   }
@@ -69,8 +66,8 @@ public class StatusReply extends BaseModel {
   @Override
   public int hashCode() {
     int result = super.hashCode();
-    result = 31 * result + (deviceId != null ? deviceId.hashCode() : 0);
     result = 31 * result + state;
+    result = 31 * result + (deviceType != null ? deviceType.hashCode() : 0);
     return result;
   }
 }
