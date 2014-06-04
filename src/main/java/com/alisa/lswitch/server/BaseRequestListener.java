@@ -58,15 +58,15 @@ public abstract class BaseRequestListener<I extends BaseRequest, O extends BaseR
         socket.receive(packet);
         ByteBuffer bb = ByteBuffer.wrap(packet.getData());
         I request = deserializeRequest(bb);
-        if (requestLookup.containsKey(request.getRequestId())
-            || !deviceId.equals(request.getDeviceId())) { continue; }
-
+        if (requestLookup.containsKey(request.getRequestId())) { continue; }
+        log.debug("Received request: {}", request);
         O reply = null;
         if (auth.isValid(request, bb)) {
           reply = processRequest(request, packet.getAddress(), packet.getPort());
         } else {
           log.info("Unauthorized request {}", request);
         }
+        log.debug("Replying: {}", reply);
         if (reply != null) {
           final byte[] replyBytes = reply.serialize();
           getSocket().send(new DatagramPacket(

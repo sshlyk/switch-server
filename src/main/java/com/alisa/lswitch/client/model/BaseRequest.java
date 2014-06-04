@@ -64,11 +64,13 @@ public abstract class BaseRequest {
     out.putLong(requestId.getMostSignificantBits());
     out.putLong(requestId.getLeastSignificantBits());
     out.putLong(timestampMsec);
-    if (deviceId == null) {
-      throw new SerializationException("Device id is missing");
+    if (deviceId != null) {
+      out.putLong(deviceId.getMostSignificantBits());
+      out.putLong(deviceId.getLeastSignificantBits());
+    } else {
+      out.putLong(0);
+      out.putLong(0);
     }
-    out.putLong(deviceId.getMostSignificantBits());
-    out.putLong(deviceId.getLeastSignificantBits());
     return out.array();
   }
 
@@ -113,7 +115,7 @@ public abstract class BaseRequest {
   /* Auto-generated */
   @Override
   public String toString() {
-    return "BaseRequest{" +
+    return "{" +
         "requestId=" + requestId +
         ", timestampMsec=" + timestampMsec +
         ", deviceId=" + deviceId +

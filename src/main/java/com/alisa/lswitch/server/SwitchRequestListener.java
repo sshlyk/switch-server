@@ -19,6 +19,11 @@ public class SwitchRequestListener extends BaseRequestListener<SwitchRequest, St
 
   @Override
   protected StatusReply processRequest(SwitchRequest request, InetAddress ip, int port) {
+    if (!getDeviceManager().getStatus().getSwitchId().equals(request.getDeviceId())) {
+      log.debug("Ignoring request since device id is different");
+      return null;
+    }
+
     final SwitchRequest.Operation op = request.getOperation();
     final SwitchController controller = getDeviceManager().getController();
     if (op == null) { return null; }
