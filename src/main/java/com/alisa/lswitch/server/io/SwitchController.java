@@ -20,8 +20,7 @@ public interface SwitchController {
   public void turnOff();
 
   /**
-   * Turn on and then off.
+   * Pulse the switch.
    */
-  public void blink();
-
+  public void pulse();
 }

@@ -3,7 +3,6 @@ package com.alisa.lswitch.server;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
-import com.alisa.lswitch.client.Auth;
 import com.alisa.lswitch.client.model.StatusReply;
 import com.alisa.lswitch.client.model.StatusRequest;
 
@@ -12,8 +11,8 @@ import com.alisa.lswitch.client.model.StatusRequest;
  */
 public class StatusRequestListener extends BaseRequestListener<StatusRequest, StatusReply> {
 
-  public StatusRequestListener(DeviceManager deviceManager, int port, Auth auth) {
-    super(deviceManager, port, auth);
+  public StatusRequestListener(DeviceManager deviceManager, int port, byte[] secret) {
+    super(deviceManager, port, secret);
   }
 
   @Override

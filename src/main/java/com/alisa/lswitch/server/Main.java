@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
 
-import com.alisa.lswitch.client.Auth;
 import com.alisa.lswitch.server.io.SingleSwitchMock;
 import com.alisa.lswitch.server.io.SingleSwitch;
 import com.alisa.lswitch.server.io.SwitchController;
@@ -30,14 +29,12 @@ public class  Main {
     log.info("Starting switch server...");
     final AppConfig config = getAppConfig(args);
     final DeviceManager deviceManager = initSwitchManager(config);
-    final Auth auth = new Auth(
-        config.getString("defaultPassword").getBytes(StandardCharsets.UTF_8)
-    );
+    final byte[] secret = config.getString("defaultPassword").getBytes(StandardCharsets.UTF_8);
 
     final StatusRequestListener statusRequestListener =
-        initStatusRequestListener(config, deviceManager, auth);
+        initStatusRequestListener(config, deviceManager, secret);
     final SwitchRequestListener switchRequestListener =
-        initSwitchRequestListener(config, deviceManager, auth);
+        initSwitchRequestListener(config, deviceManager, secret);
 
     new Thread(statusRequestListener) {{
       setDaemon(true);
@@ -48,16 +45,16 @@ public class  Main {
 
   /* Initialize status request listener that broadcast switch status */
   private static StatusRequestListener initStatusRequestListener(
-      final AppConfig appConfig, final DeviceManager deviceManager, final Auth auth) {
+      final AppConfig appConfig, final DeviceManager deviceManager, final byte[] secret) {
     final int port = appConfig.getInt("statusListenerPort");
-    return new StatusRequestListener(deviceManager, port, auth);
+    return new StatusRequestListener(deviceManager, port, secret);
   }
 
   /* Initialize switch request listener that operates GPIO pins */
   private static SwitchRequestListener initSwitchRequestListener(
-      final AppConfig appConfig, final DeviceManager deviceManager, final Auth auth) {
+      final AppConfig appConfig, final DeviceManager deviceManager, final byte[] secret) {
     final int port = appConfig.getInt("switchListenerPort");
-    return new SwitchRequestListener(deviceManager, port, auth);
+    return new SwitchRequestListener(deviceManager, port, secret);
   }
 
   /* Initialize switch manager that keeps track of switch status and has instance of controller */

@@ -4,6 +4,9 @@ import java.io.UnsupportedEncodingException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -13,7 +16,8 @@ public abstract class BaseRequest {
 
   private UUID requestId = UUID.randomUUID();
   private long timestampMsec = System.currentTimeMillis();
-  private UUID deviceId;
+  private UUID deviceId = new UUID(0, 0);
+  private byte[] sha1 = new byte[16];
 
   public static final int SERIALIZER_VERSION = 1;
 
@@ -24,11 +28,12 @@ public abstract class BaseRequest {
       final int requestSerializerVersion = serializedRequest.getInt();
       if (SERIALIZER_VERSION != requestSerializerVersion) {
         throw new SerializationException(
-            "Unknown serialization version: " + requestSerializerVersion);
+            "Unknown request format version: " + requestSerializerVersion);
       }
       requestId = new UUID(serializedRequest.getLong(), serializedRequest.getLong());
       timestampMsec = serializedRequest.getLong();
       deviceId = new UUID(serializedRequest.getLong(), serializedRequest.getLong());
+      serializedRequest.get(sha1);
     } catch (BufferUnderflowException e) {
       throw new SerializationException("Invalid request. Not all the fields are passed");
     }
@@ -39,6 +44,7 @@ public abstract class BaseRequest {
   }
 
   public void setRequestId(UUID requestId) {
+    if (requestId == null) { return; }
     this.requestId = requestId;
   }
 
@@ -55,7 +61,42 @@ public abstract class BaseRequest {
   }
 
   public void setDeviceId(UUID deviceId) {
+    if (deviceId == null) { return; }
     this.deviceId = deviceId;
+  }
+
+  public void sign(final byte[] secret) {
+    if (secret == null) { return; }
+    sha1 = calculateSha1(sha1);
+  }
+
+  public boolean verifySignature(final byte[] secret) {
+    if (secret == null) { return false; }
+    return Arrays.equals(sha1, calculateSha1(secret));
+  }
+
+  private byte[] calculateSha1(final byte[] secret) {
+    final MessageDigest mDigest;
+    try {
+      mDigest = MessageDigest.getInstance("SHA-1");
+    } catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException("Could not initialize SHA1 digest", e);
+    }
+    final ByteBuffer bb = ByteBuffer.wrap(new byte[8 + 8 + 4 + secret.length]);
+    bb.putLong(requestId.getMostSignificantBits());
+    bb.putLong(requestId.getLeastSignificantBits());
+    bb.putLong(deviceId.getMostSignificantBits());
+    bb.putLong(deviceId.getLeastSignificantBits());
+    bb.putLong(timestampMsec);
+    bb.put(secret);
+    return mDigest.digest(bb.array());
+  }
+
+  /** Request sha1 copy. */
+  public byte[] getSha1() {
+    final byte[] sha1Copy = new byte[sha1.length];
+    System.arraycopy(sha1, 0, sha1Copy, 0, sha1.length);
+    return sha1Copy;
   }
 
   public byte[] serialize() {
@@ -64,13 +105,9 @@ public abstract class BaseRequest {
     out.putLong(requestId.getMostSignificantBits());
     out.putLong(requestId.getLeastSignificantBits());
     out.putLong(timestampMsec);
-    if (deviceId != null) {
-      out.putLong(deviceId.getMostSignificantBits());
-      out.putLong(deviceId.getLeastSignificantBits());
-    } else {
-      out.putLong(0);
-      out.putLong(0);
-    }
+    out.putLong(deviceId.getMostSignificantBits());
+    out.putLong(deviceId.getLeastSignificantBits());
+    out.put(sha1);
     return out.array();
   }
 

@@ -10,7 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import com.alisa.lswitch.client.Auth;
 import com.alisa.lswitch.client.model.BaseRequest;
 
 import org.slf4j.Logger;
@@ -23,9 +22,8 @@ public abstract class BaseRequestListener<I extends BaseRequest, O extends BaseR
 
   protected final Logger log;
   private final DeviceManager deviceManager;
-  private final Auth auth;
+  private final byte[] secret;
   private final DatagramSocket socket;
-  private final UUID deviceId;
 
   private final LinkedHashMap<UUID, Long> requestLookup = new LinkedHashMap<UUID, Long>() {
     @Override
@@ -35,17 +33,16 @@ public abstract class BaseRequestListener<I extends BaseRequest, O extends BaseR
   };
 
   public BaseRequestListener(final DeviceManager deviceManager,
-                             final int port, final Auth auth) {
+                             final int port, final byte[] secret) {
     log = LoggerFactory.getLogger(this.getClass());
     log.debug("Starting {}. Port: {}", this.getClass().getSimpleName(), port);
     this.deviceManager = deviceManager;
-    this.auth = auth;
+    this.secret = secret;
     try {
       this.socket = new DatagramSocket(port);
     } catch (SocketException e) {
       throw new RuntimeException("Failed to create socket. Port: " + port, e);
     }
-    this.deviceId = deviceManager.getStatus().getSwitchId();
   }
 
   @Override
@@ -61,8 +58,14 @@ public abstract class BaseRequestListener<I extends BaseRequest, O extends BaseR
         if (requestLookup.containsKey(request.getRequestId())) { continue; }
         log.debug("Received request: {}", request);
         O reply = null;
-        if (auth.isValid(request, bb)) {
-          reply = processRequest(request, packet.getAddress(), packet.getPort());
+
+        if (request.verifySignature(secret)) {
+          final long timestampDelta = System.currentTimeMillis() - request.getTimestampMsec();
+          if (Math.abs(timestampDelta) < 60 * 1000) {
+            reply = processRequest(request, packet.getAddress(), packet.getPort());
+          } else {
+            log.info("Stale timestamp. Probably replay.", request);
+          }
         } else {
           log.info("Unauthorized request {}", request);
         }

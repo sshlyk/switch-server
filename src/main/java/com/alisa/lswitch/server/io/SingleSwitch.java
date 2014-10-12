@@ -42,8 +42,8 @@ public class SingleSwitch implements SwitchController {
   }
 
   @Override
-  public void blink() {
-    pin.blink(100);
+  public void pulse() {
+    pin.pulse(100);
   }
 
   private Pin toPin(int value) {

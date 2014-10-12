@@ -8,9 +8,7 @@ import com.alisa.lswitch.server.io.SwitchController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Manages switch info and status. Thread safe.
- */
+/** Manages switch info and status. Thread safe. */
 public class DeviceManager {
 
   private final String deviceType;
@@ -89,8 +87,10 @@ public class DeviceManager {
     }
 
     @Override
-    public void blink() {
-      controller.blink();
+    public void pulse() {
+      synchronized (controller) {
+        controller.pulse();
+      }
     }
   }
 }
