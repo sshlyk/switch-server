@@ -20,7 +20,8 @@ public class SerializerTest {
     request.setTimestampMsec(System.currentTimeMillis());
     request.setDeviceId(UUID.randomUUID());
     request.setOperation(SwitchRequest.Operation.SET_ON);
-    SwitchRequest deserializedRequest = new SwitchRequest(ByteBuffer.wrap(request.serialize()));
+    final ByteBuffer serializedRequest = ByteBuffer.wrap(request.serialize());
+    SwitchRequest deserializedRequest = new SwitchRequest(serializedRequest);
     assertEquals(request, deserializedRequest);
   }
 
@@ -30,7 +31,8 @@ public class SerializerTest {
     request.setRequestId(UUID.randomUUID());
     request.setTimestampMsec(System.currentTimeMillis());
     request.setDeviceId(UUID.randomUUID());
-    StatusRequest deserializedRequest = new StatusRequest(ByteBuffer.wrap(request.serialize()));
+    final ByteBuffer serializedReques = ByteBuffer.wrap(request.serialize());
+    StatusRequest deserializedRequest = new StatusRequest(serializedReques);
     assertEquals(request, deserializedRequest);
   }
 
@@ -39,7 +41,8 @@ public class SerializerTest {
     StatusReply reply = new StatusReply();
     reply.setDeviceId(UUID.randomUUID());
     reply.setDeviceType("switch");
-    StatusReply deserializedReply = new StatusReply(ByteBuffer.wrap(reply.serialize()));
+    final ByteBuffer serializedReply = ByteBuffer.wrap(reply.serialize());
+    StatusReply deserializedReply = new StatusReply(serializedReply);
     assertEquals(reply, deserializedReply);
   }
 }

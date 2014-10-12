@@ -100,7 +100,7 @@ public abstract class BaseRequest {
   }
 
   public byte[] serialize() {
-    ByteBuffer out = ByteBuffer.wrap(new byte[4 + 3 * 8 + 16]);
+    ByteBuffer out = ByteBuffer.wrap(new byte[4 + 3 * 8 + 16 + 16]);
     out.putInt(SERIALIZER_VERSION);
     out.putLong(requestId.getMostSignificantBits());
     out.putLong(requestId.getLeastSignificantBits());
