@@ -11,5 +11,4 @@ public class StatusRequest extends BaseRequest {
   public StatusRequest(final ByteBuffer serializedRequest) {
     super(serializedRequest);
   }
-
 }

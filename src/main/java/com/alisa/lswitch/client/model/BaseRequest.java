@@ -17,7 +17,7 @@ public abstract class BaseRequest {
   private UUID requestId = UUID.randomUUID();
   private long timestampMsec = System.currentTimeMillis();
   private UUID deviceId = new UUID(0, 0);
-  private byte[] sha1 = new byte[16];
+  private byte[] sha1 = new byte[20];
 
   public static final int SERIALIZER_VERSION = 1;
 
@@ -67,7 +67,7 @@ public abstract class BaseRequest {
 
   public void sign(final byte[] secret) {
     if (secret == null) { return; }
-    sha1 = calculateSha1(sha1);
+    sha1 = calculateSha1(secret);
   }
 
   public boolean verifySignature(final byte[] secret) {
@@ -82,7 +82,7 @@ public abstract class BaseRequest {
     } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException("Could not initialize SHA1 digest", e);
     }
-    final ByteBuffer bb = ByteBuffer.wrap(new byte[8 + 8 + 4 + secret.length]);
+    final ByteBuffer bb = ByteBuffer.wrap(new byte[16 + 16 + 8 + secret.length]);
     bb.putLong(requestId.getMostSignificantBits());
     bb.putLong(requestId.getLeastSignificantBits());
     bb.putLong(deviceId.getMostSignificantBits());
@@ -92,15 +92,8 @@ public abstract class BaseRequest {
     return mDigest.digest(bb.array());
   }
 
-  /** Request sha1 copy. */
-  public byte[] getSha1() {
-    final byte[] sha1Copy = new byte[sha1.length];
-    System.arraycopy(sha1, 0, sha1Copy, 0, sha1.length);
-    return sha1Copy;
-  }
-
   public byte[] serialize() {
-    ByteBuffer out = ByteBuffer.wrap(new byte[4 + 3 * 8 + 16 + 16]);
+    ByteBuffer out = ByteBuffer.wrap(new byte[4 + 16 + 8 + 16 + sha1.length]);
     out.putInt(SERIALIZER_VERSION);
     out.putLong(requestId.getMostSignificantBits());
     out.putLong(requestId.getLeastSignificantBits());
@@ -148,29 +141,19 @@ public abstract class BaseRequest {
     }
   }
 
-
-  /* Auto-generated */
-  @Override
-  public String toString() {
-    return "{" +
-        "requestId=" + requestId +
-        ", timestampMsec=" + timestampMsec +
-        ", deviceId=" + deviceId +
-        '}';
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    BaseRequest baseModel = (BaseRequest) o;
+    BaseRequest request = (BaseRequest) o;
 
-    if (timestampMsec != baseModel.timestampMsec) return false;
-    if (deviceId != null ? !deviceId.equals(baseModel.deviceId) : baseModel.deviceId != null)
+    if (timestampMsec != request.timestampMsec) return false;
+    if (deviceId != null ? !deviceId.equals(request.deviceId) : request.deviceId != null)
       return false;
-    if (requestId != null ? !requestId.equals(baseModel.requestId) : baseModel.requestId != null)
+    if (requestId != null ? !requestId.equals(request.requestId) : request.requestId != null)
       return false;
+    if (!Arrays.equals(sha1, request.sha1)) return false;
 
     return true;
   }
@@ -180,6 +163,16 @@ public abstract class BaseRequest {
     int result = requestId != null ? requestId.hashCode() : 0;
     result = 31 * result + (int) (timestampMsec ^ (timestampMsec >>> 32));
     result = 31 * result + (deviceId != null ? deviceId.hashCode() : 0);
+    result = 31 * result + (sha1 != null ? Arrays.hashCode(sha1) : 0);
     return result;
   }
+
+  @Override
+  public String toString() {
+    return "requestId=" + requestId +
+        ", timestampMsec=" + timestampMsec +
+        ", deviceId=" + deviceId +
+        ", sha1=" + Arrays.toString(sha1);
+  }
+
 }
