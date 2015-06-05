@@ -60,12 +60,7 @@ public abstract class BaseRequestListener<I extends BaseRequest, O extends BaseR
         O reply = null;
 
         if (request.verifySignature(secret)) {
-          final long timestampDelta = System.currentTimeMillis() - request.getTimestampMsec();
-          if (Math.abs(timestampDelta) < 60 * 1000) {
-            reply = processRequest(request, packet.getAddress(), packet.getPort());
-          } else {
-            log.info("Stale timestamp. Probably replay.", request);
-          }
+          reply = processRequest(request, packet.getAddress(), packet.getPort());
         } else {
           log.info("Unauthorized request {}", request);
         }

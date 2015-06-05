@@ -15,7 +15,6 @@ import java.util.UUID;
 public abstract class BaseRequest {
 
   private UUID requestId = UUID.randomUUID();
-  private long timestampMsec = System.currentTimeMillis();
   private UUID deviceId = new UUID(0, 0);
   private byte[] sha1 = new byte[20];
 
@@ -31,7 +30,6 @@ public abstract class BaseRequest {
             "Unknown request format version: " + requestSerializerVersion);
       }
       requestId = new UUID(serializedRequest.getLong(), serializedRequest.getLong());
-      timestampMsec = serializedRequest.getLong();
       deviceId = new UUID(serializedRequest.getLong(), serializedRequest.getLong());
       serializedRequest.get(sha1);
     } catch (BufferUnderflowException e) {
@@ -46,14 +44,6 @@ public abstract class BaseRequest {
   public void setRequestId(UUID requestId) {
     if (requestId == null) { return; }
     this.requestId = requestId;
-  }
-
-  public long getTimestampMsec() {
-    return timestampMsec;
-  }
-
-  public void setTimestampMsec(long timestampMsec) {
-    this.timestampMsec = timestampMsec;
   }
 
   public UUID getDeviceId() {
@@ -82,22 +72,20 @@ public abstract class BaseRequest {
     } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException("Could not initialize SHA1 digest", e);
     }
-    final ByteBuffer bb = ByteBuffer.wrap(new byte[16 + 16 + 8 + secret.length]);
+    final ByteBuffer bb = ByteBuffer.wrap(new byte[16 + 16 + secret.length]);
     bb.putLong(requestId.getMostSignificantBits());
     bb.putLong(requestId.getLeastSignificantBits());
     bb.putLong(deviceId.getMostSignificantBits());
     bb.putLong(deviceId.getLeastSignificantBits());
-    bb.putLong(timestampMsec);
     bb.put(secret);
     return mDigest.digest(bb.array());
   }
 
   public byte[] serialize() {
-    ByteBuffer out = ByteBuffer.wrap(new byte[4 + 16 + 8 + 16 + sha1.length]);
+    ByteBuffer out = ByteBuffer.wrap(new byte[4 + 16 + 16 + sha1.length]);
     out.putInt(SERIALIZER_VERSION);
     out.putLong(requestId.getMostSignificantBits());
     out.putLong(requestId.getLeastSignificantBits());
-    out.putLong(timestampMsec);
     out.putLong(deviceId.getMostSignificantBits());
     out.putLong(deviceId.getLeastSignificantBits());
     out.put(sha1);
@@ -148,7 +136,6 @@ public abstract class BaseRequest {
 
     BaseRequest request = (BaseRequest) o;
 
-    if (timestampMsec != request.timestampMsec) return false;
     if (deviceId != null ? !deviceId.equals(request.deviceId) : request.deviceId != null)
       return false;
     if (requestId != null ? !requestId.equals(request.requestId) : request.requestId != null)
@@ -161,7 +148,6 @@ public abstract class BaseRequest {
   @Override
   public int hashCode() {
     int result = requestId != null ? requestId.hashCode() : 0;
-    result = 31 * result + (int) (timestampMsec ^ (timestampMsec >>> 32));
     result = 31 * result + (deviceId != null ? deviceId.hashCode() : 0);
     result = 31 * result + (sha1 != null ? Arrays.hashCode(sha1) : 0);
     return result;
@@ -170,7 +156,6 @@ public abstract class BaseRequest {
   @Override
   public String toString() {
     return "requestId=" + requestId +
-        ", timestampMsec=" + timestampMsec +
         ", deviceId=" + deviceId +
         ", sha1=" + Arrays.toString(sha1);
   }

@@ -1,13 +1,6 @@
 package com.alisa.lswitch.server.io;
 
-import com.alisa.lswitch.server.exceptions.SwitchException;
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.RaspiPin;
-
+import com.pi4j.io.gpio.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,32 +11,37 @@ import org.slf4j.LoggerFactory;
 public class SingleSwitch implements SwitchController {
 
   private static final Logger log = LoggerFactory.getLogger(SingleSwitch.class);
-  private final GpioController gpio;
   private final GpioPinDigitalOutput pin;
 
   public SingleSwitch(int switchGPIOPinNumber) {
     log.debug("Raspberry switch. PinNumber: {}", switchGPIOPinNumber);
-    this.gpio = GpioFactory.getInstance();
-    this.pin = gpio.provisionDigitalOutputPin(
+    this.pin = GpioFactory.getInstance().provisionDigitalOutputPin(
         toPin(switchGPIOPinNumber),
         String.valueOf(switchGPIOPinNumber),
-        PinState.HIGH
+        PinState.HIGH // misleading, but this keeps relay open (off)
     );
+    this.pin.setShutdownOptions(true, PinState.HIGH);
   }
 
   @Override
   public void turnOn() {
-    pin.low();
+    pin.low(); //initial state is HIGH == off
   }
 
   @Override
   public void turnOff() {
-    pin.high();
+    pin.high(); //initial state is HIGH == off
   }
 
   @Override
   public void pulse() {
-    pin.pulse(100);
+    turnOn();
+    try {
+      Thread.sleep(100);
+    } catch (InterruptedException e) {
+      log.debug("Pulse operation has been interrupted", e);
+    }
+    turnOff();
   }
 
   private Pin toPin(int value) {

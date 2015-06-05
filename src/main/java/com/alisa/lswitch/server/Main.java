@@ -70,7 +70,8 @@ public class  Main {
       switchController = new SingleSwitch(pinNumber);
       switchId = SwitchUtils.getSerialNumber();
     }
-    return new DeviceManager(switchController, switchId, appConfig.getString("deviceType"));
+    return new DeviceManager(switchController, switchId,
+        appConfig.getString("deviceName"), appConfig.getString("deviceType"));
   }
 
   /* Read application configuration from resources */

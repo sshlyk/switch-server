@@ -7,6 +7,7 @@ public class StatusReply extends BaseRequest {
 
   private int state;
   private String deviceType;
+  private String deviceName;
 
   public StatusReply() { }
 
@@ -15,6 +16,7 @@ public class StatusReply extends BaseRequest {
     try {
       state = serializedRequest.getInt();
       deviceType = deserializeString(serializedRequest);
+      deviceName = deserializeString(serializedRequest);
     } catch (BufferUnderflowException e) {
       throw new SerializationException("Invalid request. Not all the fields are passed");
     }
@@ -23,11 +25,13 @@ public class StatusReply extends BaseRequest {
   @Override
   public byte[] serialize() {
     final byte[] serializedDeviceType = serializeString(deviceType);
+    final byte[] serializedDeviceName = serializeString(deviceName);
     final byte[] base = super.serialize();
-    ByteBuffer bb = ByteBuffer.wrap(new byte[base.length + 4 + serializedDeviceType.length]);
+    ByteBuffer bb = ByteBuffer.wrap(new byte[base.length + 4 + serializedDeviceType.length + serializedDeviceName.length]);
     bb.put(base);
     bb.putInt(state);
     bb.put(serializedDeviceType);
+    bb.put(serializedDeviceName);
     return bb.array();
   }
 
@@ -46,6 +50,10 @@ public class StatusReply extends BaseRequest {
   public void setDeviceType(String deviceType) {
     this.deviceType = deviceType;
   }
+
+  public String getDeviceName() { return deviceName; }
+
+  public void setDeviceName(String deviceName) { this.deviceName = deviceName; }
 
   /* Auto-generated */
   @Override

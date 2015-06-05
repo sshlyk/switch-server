@@ -34,6 +34,7 @@ public class StatusRequestListener extends BaseRequestListener<StatusRequest, St
     statusReply.setDeviceId(status.getSwitchId());
     statusReply.setState(status.getState());
     statusReply.setDeviceType(deviceManager.getDeviceType());
+    statusReply.setDeviceName(deviceManager.getDeviceName());
     return statusReply;
   }
 }

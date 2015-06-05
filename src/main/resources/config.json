@@ -4,7 +4,8 @@
     "switchListenerPort": 61235,
     "switchPinNumber": 7,
     "defaultPassword": "helloSwitch",
-    "deviceType": "garage"
+    "deviceType": "garage",
+    "deviceName": "Garage Door"
   },
   "development": {
     "mockSwitch": true

@@ -12,17 +12,19 @@ import org.slf4j.LoggerFactory;
 public class DeviceManager {
 
   private final String deviceType;
+  private final String deviceName;
   private final Status status;
   private final SwitchController controller;
   private static Logger log = LoggerFactory.getLogger(DeviceManager.class);
 
-  public DeviceManager(SwitchController switchController, UUID switchId, String deviceType) {
+  public DeviceManager(SwitchController switchController, UUID switchId, String deviceName, String deviceType) {
     log.debug("Device ID: " + switchId);
 
     this.status = new Status();
     this.controller = switchController;
     this.status.switchId = switchId;
     this.deviceType = deviceType;
+    this.deviceName = deviceName;
   }
 
   /* returns snapshot of current status */
@@ -39,6 +41,8 @@ public class DeviceManager {
   public String getDeviceType() {
     return deviceType;
   }
+
+  public String getDeviceName() { return deviceName; }
 
   /** Holds current status of the switch. */
   /* Make sure it is immutable. */
