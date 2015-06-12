@@ -24,6 +24,6 @@ public class SingleSwitchMock implements SwitchController {
 
   @Override
   public void pulse() {
-    log.info("Blink");
+    log.info("Pulse");
   }
 }

@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
  */
 public class StatusRequest extends BaseRequest {
 
-  public StatusRequest() { }
+  public StatusRequest() { super(STATUS_REQUEST); }
   public StatusRequest(final ByteBuffer serializedRequest) {
     super(serializedRequest);
   }

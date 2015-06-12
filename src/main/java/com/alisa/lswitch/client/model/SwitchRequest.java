@@ -8,12 +8,12 @@ import java.nio.ByteBuffer;
  */
 public class SwitchRequest extends BaseRequest {
 
-  public enum Operation { SET_ON, SET_OFF, BLINK }
+  public enum Operation { SET_ON, SET_OFF, PULSE}
 
   private Operation operation = Operation.SET_OFF;
 
   public SwitchRequest() {
-    super();
+    super(SWITCH_REQUEST);
   }
 
   public SwitchRequest(ByteBuffer serializedRequest) {

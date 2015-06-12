@@ -70,11 +70,11 @@ public class AppConfig {
     return getVal(key, String.class);
   }
 
-  public Map<String, String> getMap(String key) {
+  public Map getMap(String key) {
     return getVal(key, Map.class);
   }
 
-  public List<String> getList(String key) {
+  public List getList(String key) {
     return getVal(key, List.class);
   }
 

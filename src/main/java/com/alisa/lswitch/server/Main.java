@@ -1,20 +1,20 @@
 package com.alisa.lswitch.server;
 
+import com.alisa.lswitch.server.io.SingleSwitch;
+import com.alisa.lswitch.server.io.SingleSwitchMock;
+import com.alisa.lswitch.server.io.SwitchController;
+import com.alisa.lswitch.server.lib.AppConfig;
+import com.alisa.lswitch.server.lib.SwitchUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
-
-import com.alisa.lswitch.server.io.SingleSwitchMock;
-import com.alisa.lswitch.server.io.SingleSwitch;
-import com.alisa.lswitch.server.io.SwitchController;
-import com.alisa.lswitch.server.lib.AppConfig;
-import com.alisa.lswitch.server.lib.SwitchUtils;
-
-import org.codehaus.jackson.map.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.alisa.lswitch.server.lib.AppConfig.Flavor;
 
@@ -28,50 +28,39 @@ public class  Main {
   public static void main(String[] args) {
     log.info("Starting switch server...");
     final AppConfig config = getAppConfig(args);
-    final DeviceManager deviceManager = initSwitchManager(config);
-    final byte[] secret = config.getString("defaultPassword").getBytes(StandardCharsets.UTF_8);
+    final Map<String, Map> devices = (Map<String, Map>) config.getMap("devices");
+    final int port = config.getInt("port");
+    final byte[] secret = (config.getString("password")).getBytes(StandardCharsets.UTF_8);
+    final boolean mockSwitch = Boolean.TRUE.equals(config.getBoolean("mockDevices"));
 
-    final StatusRequestListener statusRequestListener =
-        initStatusRequestListener(config, deviceManager, secret);
-    final SwitchRequestListener switchRequestListener =
-        initSwitchRequestListener(config, deviceManager, secret);
-
-    new Thread(statusRequestListener) {{
-      setDaemon(true);
-    }}.start();
-    new Thread(switchRequestListener).start();
-    log.info("Server is running.");
-  }
-
-  /* Initialize status request listener that broadcast switch status */
-  private static StatusRequestListener initStatusRequestListener(
-      final AppConfig appConfig, final DeviceManager deviceManager, final byte[] secret) {
-    final int port = appConfig.getInt("statusListenerPort");
-    return new StatusRequestListener(deviceManager, port, secret);
-  }
-
-  /* Initialize switch request listener that operates GPIO pins */
-  private static SwitchRequestListener initSwitchRequestListener(
-      final AppConfig appConfig, final DeviceManager deviceManager, final byte[] secret) {
-    final int port = appConfig.getInt("switchListenerPort");
-    return new SwitchRequestListener(deviceManager, port, secret);
+    final Map<UUID, DeviceManager> deviceManagers = new ConcurrentHashMap<>();
+    for (Map.Entry<String, Map> device: devices.entrySet()) {
+      final String deviceName = device.getKey();
+      final Map deviceConfig = device.getValue();
+      final String deviceType = (String) deviceConfig.get("deviceType");
+      final int pinNumber = (int) deviceConfig.get("switchPinNumber");
+      final DeviceManager deviceManager = initSwitchManager(deviceName, deviceType, pinNumber, mockSwitch);
+      deviceManagers.put(deviceManager.getStatus().getSwitchId(), deviceManager);
+    }
+    final NetworkClient networkClient = new NetworkClient(port, secret);
+    new Thread(new StatusRequestProcessor(deviceManagers, networkClient)).start();
+    new Thread(new SwitchRequestProcessor(deviceManagers, networkClient)).start();
   }
 
   /* Initialize switch manager that keeps track of switch status and has instance of controller */
-  private static DeviceManager initSwitchManager(AppConfig appConfig) {
+  private static DeviceManager initSwitchManager(final String deviceName, final String deviceType,
+                                                 final int pinNumber, final boolean mockSwitch) {
     final SwitchController switchController;
     final UUID switchId;
-    if (Boolean.TRUE.equals(appConfig.getBoolean("mockSwitch"))) {
+    if (mockSwitch) {
       log.debug("Using mocked switch");
       switchController = new SingleSwitchMock();
       switchId = UUID.randomUUID();
     } else {
-      final int pinNumber = appConfig.getInt("switchPinNumber");
       switchController = new SingleSwitch(pinNumber);
       switchId = SwitchUtils.getSerialNumber();
     }
-    return new DeviceManager(switchController, switchId,
-        appConfig.getString("deviceName"), appConfig.getString("deviceType"));
+    return new DeviceManager(switchController, switchId, deviceName, deviceType);
   }
 
   /* Read application configuration from resources */

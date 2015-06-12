@@ -17,10 +17,15 @@ public abstract class BaseRequest {
   private UUID requestId = UUID.randomUUID();
   private UUID deviceId = new UUID(0, 0);
   private byte[] sha1 = new byte[20];
+  private byte requestType = 0;
+
+  public final static byte STATUS_REQUEST = 1;
+  public final static byte SWITCH_REQUEST = 2;
+  public final static byte STATUS_REPLY = 4;
 
   public static final int SERIALIZER_VERSION = 1;
 
-  public BaseRequest() { }
+  public BaseRequest(byte requestType) { this.requestType = requestType; }
 
   public BaseRequest(ByteBuffer serializedRequest) {
     try {
@@ -29,6 +34,7 @@ public abstract class BaseRequest {
         throw new SerializationException(
             "Unknown request format version: " + requestSerializerVersion);
       }
+      requestType = serializedRequest.get();
       requestId = new UUID(serializedRequest.getLong(), serializedRequest.getLong());
       deviceId = new UUID(serializedRequest.getLong(), serializedRequest.getLong());
       serializedRequest.get(sha1);
@@ -54,6 +60,8 @@ public abstract class BaseRequest {
     if (deviceId == null) { return; }
     this.deviceId = deviceId;
   }
+
+  public byte getRequestType() { return requestType; }
 
   public void sign(final byte[] secret) {
     if (secret == null) { return; }
@@ -82,8 +90,9 @@ public abstract class BaseRequest {
   }
 
   public byte[] serialize() {
-    ByteBuffer out = ByteBuffer.wrap(new byte[4 + 16 + 16 + sha1.length]);
+    ByteBuffer out = ByteBuffer.wrap(new byte[4 + 1 + 16 + 16 + sha1.length]);
     out.putInt(SERIALIZER_VERSION);
+    out.put(requestType);
     out.putLong(requestId.getMostSignificantBits());
     out.putLong(requestId.getLeastSignificantBits());
     out.putLong(deviceId.getMostSignificantBits());

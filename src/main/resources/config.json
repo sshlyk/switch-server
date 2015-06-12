@@ -1,15 +1,24 @@
 {
   "common": {
-    "statusListenerPort": 51235,
-    "switchListenerPort": 61235,
-    "switchPinNumber": 7,
-    "defaultPassword": "helloSwitch",
-    "deviceType": "garage",
-    "deviceName": "Garage Door"
+    "port": 61235,
+    "password": "helloSwitch",
+
+    "devices": {
+      "Garage Door": {
+        "switchPinNumber": 7,
+        "deviceType": "garage"
+      },
+      "Attic Fan": {
+        "switchPinNumber": 8,
+        "deviceType": "switch"
+      }
+    }
   },
+
   "development": {
-    "mockSwitch": true
+    "mockDevices": true
   },
+
   "release": {
 
   }

@@ -9,7 +9,7 @@ public class StatusReply extends BaseRequest {
   private String deviceType;
   private String deviceName;
 
-  public StatusReply() { }
+  public StatusReply() { super(STATUS_REPLY); }
 
   public StatusReply(ByteBuffer serializedRequest) {
     super(serializedRequest);
