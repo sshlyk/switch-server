@@ -58,7 +58,7 @@ public class  Main {
       switchId = UUID.randomUUID();
     } else {
       switchController = new SingleSwitch(pinNumber);
-      switchId = SwitchUtils.getSerialNumber();
+      switchId = UUID.randomUUID();
     }
     return new DeviceManager(switchController, switchId, deviceName, deviceType);
   }

@@ -8,8 +8,12 @@
         "switchPinNumber": 7,
         "deviceType": "garage"
       },
-      "Attic Fan": {
-        "switchPinNumber": 8,
+      "House Ceiling Fan": {
+        "switchPinNumber": 0,
+        "deviceType": "switch"
+      },
+      "Furnace Blower": {
+        "switchPinNumber": 2,
         "deviceType": "switch"
       }
     }
