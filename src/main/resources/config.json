@@ -1,0 +1,29 @@
+{
+  "common": {
+    "port": 61235,
+    "password": "helloSwitch",
+
+    "devices": {
+      "Garage Door": {
+        "switchPinNumber": 7,
+        "deviceType": "garage"
+      },
+      "House Ceiling Fan": {
+        "switchPinNumber": 0,
+        "deviceType": "switch"
+      },
+      "Furnace Blower": {
+        "switchPinNumber": 2,
+        "deviceType": "switch"
+      }
+    }
+  },
+
+  "development": {
+    "mockDevices": true
+  },
+
+  "release": {
+
+  }
+}
