@@ -2,18 +2,15 @@
 Small server that runs on RaspberryPi and interacts with GPIOs and control external relays. It makes itself discoverable and can be operated remotely using [switch-android](https://github.com/sshlyk/switch-android) client
 
 ## How to
-Download
-```
-[switch-server-1.0.jar](https://drive.google.com/file/d/0B_u36ffL9B2jeWUxT3RtWGlsRDA/view?usp=sharing)
-```
+Download [switch-server-1.0.jar](https://drive.google.com/file/d/0B_u36ffL9B2jeWUxT3RtWGlsRDA/view?usp=sharing)
 or build
 
 ```
 ./gradlew
 ```
-will generate self-contained jar file in build/libs you can immediately execute.
+Build command will generate self-contained jar file in build/libs you can immediately execute.
 
-To execute it locally (RaspberryPI GPIO interactions are mocked)
+To execute it locally on your computer (RaspberryPI GPIO interactions are mocked)
 
 ```
 java -jar build/libs/switch-server-1.0.jar --flavor dev
