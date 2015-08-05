@@ -1,17 +1,20 @@
 package com.alisa.lswitch.server;
 
+import com.alisa.lswitch.server.exceptions.SwitchException;
 import com.alisa.lswitch.server.io.SingleSwitch;
 import com.alisa.lswitch.server.io.SingleSwitchMock;
 import com.alisa.lswitch.server.io.SwitchController;
 import com.alisa.lswitch.server.lib.AppConfig;
-import com.alisa.lswitch.server.lib.SwitchUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +26,6 @@ import static com.alisa.lswitch.server.lib.AppConfig.Flavor;
  */
 public class  Main {
   private static final Logger log = LoggerFactory.getLogger(Main.class);
-  private static final String configResourceName = "/config.json";
 
   public static void main(String[] args) {
     log.info("Starting switch server...");
@@ -65,26 +67,53 @@ public class  Main {
 
   /* Read application configuration from resources */
   private static AppConfig getAppConfig(final String[] args) {
-    final Flavor flavor;
-    if (args != null && args.length > 0 && "dev".equals(args[0])) {
-      flavor = Flavor.DEVELOPMENT;
-    } else {
-      flavor = Flavor.RELEASE;
-    }
+    final Map<String, String> argsMap = parseArgs(args);
+    final Flavor flavor = "dev".equals(argsMap.get("flavor")) ? Flavor.DEVELOPMENT : Flavor.RELEASE;
+    final String configFilePath = argsMap.get("config");
     try {
       final Map<String, Map<String, Object>> jsonConfig =
           new ObjectMapper().readValue(
-              getResource(configResourceName),
+              getResource(configFilePath),
               Map.class
           );
       return new AppConfig(jsonConfig, flavor);
     } catch (IOException e) {
-      throw new RuntimeException("Failed to load config resource: " + configResourceName, e);
+      throw new RuntimeException("Failed to load config resource", e);
     }
   }
 
-  private static InputStream getResource(String resourceName) {
-      return Thread.currentThread().getClass().getResourceAsStream(resourceName);
+  private static InputStream getResource(String configPath) {
+    if (configPath == null || configPath.isEmpty()) {
+      log.info("You did provide path to a config json file (--config /path/to/config.json) using default.");
+      return Thread.currentThread().getClass().getResourceAsStream("/switch-config.json");
+    } else {
+      try {
+        final InputStream externalConfig = new FileInputStream(configPath);
+        log.info("Found configuration file: " + configPath);
+        return externalConfig;
+      } catch (FileNotFoundException e) {
+        throw new RuntimeException("Could not find config file: " + configPath);
+      }
+    }
+  }
+
+  private static Map<String, String> parseArgs(String[] args) {
+    final Map<String, String> argsMap = new HashMap<>();
+    if (args == null) {
+      log.info("No arguments provided");
+    }
+    if (args.length % 2 != 0) {
+      log.error("Invalid list of arguments. Expected format: \"--key value\"");
+    }
+    for (int i = 0; i < args.length; i += 2) {
+      final String key = args[i];
+      final String value = args[i+1];
+      if (!key.startsWith("--") && key.length() < 3) {
+        log.error("Invalid key: " + key + ". Value: " + value);
+      }
+      argsMap.put(key.substring(2), value);
+    }
+    return argsMap;
   }
 }
 

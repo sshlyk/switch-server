@@ -5,15 +5,15 @@
 
     "devices": {
       "Garage Door": {
-        "switchPinNumber": 7,
+        "switchPinNumber": 0,
         "deviceType": "garage"
       },
       "House Ceiling Fan": {
-        "switchPinNumber": 0,
+        "switchPinNumber": 2,
         "deviceType": "switch"
       },
       "Furnace Blower": {
-        "switchPinNumber": 2,
+        "switchPinNumber": 3,
         "deviceType": "switch"
       }
     }
