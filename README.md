@@ -2,6 +2,8 @@
 Small server that runs on RaspberryPi and interacts with GPIOs and controls external relays. It makes itself discoverable and can be operated remotely using client for Android.
 Get client on [Google Play](https://play.google.com/store/apps/details?id=com.alisa.lswitch) or [github](https://github.com/sshlyk/switch-android).
 
+[Instructables link](http://www.instructables.com/id/RaspberryPi-Android-Switch-Home-automation/)
+
 ## How to
 Download [switch-server-1.0.jar](https://drive.google.com/file/d/0B_u36ffL9B2jeWUxT3RtWGlsRDA/view?usp=sharing)
 or build
