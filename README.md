@@ -1,7 +1,12 @@
 # Switch Server
 Small server that runs on RaspberryPi and interacts with GPIOs and control external relays. It makes itself discoverable and can be operated remotely using [switch-android](https://github.com/sshlyk/switch-android) client
 
-## How to build
+## How to
+Download
+```
+[switch-server-1.0.jar](https://drive.google.com/file/d/0B_u36ffL9B2jeWUxT3RtWGlsRDA/view?usp=sharing)
+```
+or build
 
 ```
 ./gradlew
@@ -17,10 +22,11 @@ java -jar build/libs/switch-server-1.0.jar --flavor dev
 To execute it on your raspberry device
 
 ```
-java -jar build/libs/switch-server-1.0.jar --config /path/to/your/config.json 
+sudo java -jar switch-server-1.0.jar --config /path/to/your/config.json 
 ```
+Your device is now discoverable via [switch-android](https://github.com/sshlyk/switch-android) client
 
-were config.json is in following format:
+Config format:
 ```
 {
   "common": {
