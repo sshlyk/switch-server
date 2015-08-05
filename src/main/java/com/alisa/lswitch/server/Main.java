@@ -101,9 +101,10 @@ public class  Main {
     final Map<String, String> argsMap = new HashMap<>();
     if (args == null) {
       log.info("No arguments provided");
+      return argsMap;
     }
     if (args.length % 2 != 0) {
-      log.error("Invalid list of arguments. Expected format: \"--key value\"");
+      throw new RuntimeException("Invalid list of arguments. Expected format: \"--key value\"");
     }
     for (int i = 0; i < args.length; i += 2) {
       final String key = args[i];
