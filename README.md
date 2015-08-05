@@ -1,5 +1,6 @@
 # Switch Server
-Small server that runs on RaspberryPi and interacts with GPIOs and control external relays. It makes itself discoverable and can be operated remotely using [switch-android](https://github.com/sshlyk/switch-android) client
+Small server that runs on RaspberryPi and interacts with GPIOs and controls external relays. It makes itself discoverable and can be operated remotely using client for Android.
+Get client on [Google Play](https://play.google.com/store/apps/details?id=com.alisa.lswitch) or [github](https://github.com/sshlyk/switch-android).
 
 ## How to
 Download [switch-server-1.0.jar](https://drive.google.com/file/d/0B_u36ffL9B2jeWUxT3RtWGlsRDA/view?usp=sharing)
@@ -21,7 +22,7 @@ To execute it on your raspberry device
 ```
 sudo java -jar switch-server-1.0.jar --config /path/to/your/config.json 
 ```
-Your device is now discoverable via [switch-android](https://github.com/sshlyk/switch-android) client
+Your device is now discoverable via [Switch Client](https://play.google.com/store/apps/details?id=com.alisa.lswitch)
 
 Config format:
 ```
