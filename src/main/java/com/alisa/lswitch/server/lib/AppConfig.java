@@ -18,15 +18,19 @@ public class AppConfig {
   public AppConfig(final Map<String, Map<String, Object>> jsonConfig, final Flavor flavor) {
     final HashMap<String, Object> combinedConfig = new HashMap<String, Object>();
     combinedConfig.putAll(jsonConfig.get("common"));
+    final Map<String, Object> flavorConfig;
     switch(flavor) {
       case DEVELOPMENT:
-        combinedConfig.putAll(jsonConfig.get("development"));
+        flavorConfig = jsonConfig.get("development");
         break;
       case RELEASE:
-        combinedConfig.putAll(jsonConfig.get("release"));
+        flavorConfig = jsonConfig.get("release");
         break;
       default:
         throw new RuntimeException("Unknown flavor " + flavor);
+    }
+    if (flavorConfig != null) {
+      combinedConfig.putAll(flavorConfig);
     }
 
     this.config = Collections.unmodifiableMap(combinedConfig);

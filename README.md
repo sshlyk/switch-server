@@ -47,6 +47,10 @@ Config format:
 
   "development": {
     "mockDevices": true
+  },
+
+  "release": {
+
   }
 }
 ```
