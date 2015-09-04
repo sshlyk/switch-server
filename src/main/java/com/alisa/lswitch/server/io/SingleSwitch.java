@@ -12,8 +12,9 @@ public class SingleSwitch implements SwitchController {
 
   private static final Logger log = LoggerFactory.getLogger(SingleSwitch.class);
   private final GpioPinDigitalOutput pin;
+  private final int pulseDelay;
 
-  public SingleSwitch(int switchGPIOPinNumber) {
+  public SingleSwitch(int switchGPIOPinNumber, int pulseDelay) {
     log.debug("Raspberry switch. PinNumber: {}", switchGPIOPinNumber);
     this.pin = GpioFactory.getInstance().provisionDigitalOutputPin(
         toPin(switchGPIOPinNumber),
@@ -21,6 +22,7 @@ public class SingleSwitch implements SwitchController {
         PinState.HIGH // misleading, but this keeps relay open (off)
     );
     this.pin.setShutdownOptions(true, PinState.HIGH);
+    this.pulseDelay = pulseDelay;
   }
 
   @Override
@@ -37,7 +39,7 @@ public class SingleSwitch implements SwitchController {
   public void pulse() {
     turnOn();
     try {
-      Thread.sleep(100);
+      Thread.sleep(pulseDelay);
     } catch (InterruptedException e) {
       log.debug("Pulse operation has been interrupted", e);
     }

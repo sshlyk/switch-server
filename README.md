@@ -36,7 +36,8 @@ Config format:
     "devices": {
       "Garage Door": {
         "switchPinNumber": 0,
-        "deviceType": "garage"
+        "deviceType": "button",
+        "buttonDelay": 100
       },
       "House Ceiling Fan": {
         "switchPinNumber": 2,

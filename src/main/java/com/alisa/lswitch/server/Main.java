@@ -41,7 +41,9 @@ public class  Main {
       final Map deviceConfig = device.getValue();
       final String deviceType = (String) deviceConfig.get("deviceType");
       final int pinNumber = (int) deviceConfig.get("switchPinNumber");
-      final DeviceManager deviceManager = initSwitchManager(deviceName, deviceType, pinNumber, mockSwitch);
+      final Integer pulseDelay = (Integer) deviceConfig.get("buttonDelay");
+      final DeviceManager deviceManager = initSwitchManager(deviceName, deviceType, pinNumber,
+          pulseDelay != null && pulseDelay > 0 ? pulseDelay : 100, mockSwitch);
       deviceManagers.put(deviceManager.getStatus().getSwitchId(), deviceManager);
     }
     final NetworkClient networkClient = new NetworkClient(port, secret);
@@ -51,7 +53,8 @@ public class  Main {
 
   /* Initialize switch manager that keeps track of switch status and has instance of controller */
   private static DeviceManager initSwitchManager(final String deviceName, final String deviceType,
-                                                 final int pinNumber, final boolean mockSwitch) {
+                                                 final int pinNumber, final int pulseDelay,
+                                                 final boolean mockSwitch) {
     final SwitchController switchController;
     final UUID switchId;
     if (mockSwitch) {
@@ -59,7 +62,7 @@ public class  Main {
       switchController = new SingleSwitchMock();
       switchId = UUID.randomUUID();
     } else {
-      switchController = new SingleSwitch(pinNumber);
+      switchController = new SingleSwitch(pinNumber, pulseDelay);
       switchId = UUID.randomUUID();
     }
     return new DeviceManager(switchController, switchId, deviceName, deviceType);
